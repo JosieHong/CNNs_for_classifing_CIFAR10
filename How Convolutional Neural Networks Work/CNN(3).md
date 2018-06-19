@@ -2,9 +2,11 @@
 
 ## 神经网络是怎样工作的（3）
 
-> 原视频地址：https://www.youtube.com/watch?v=FmpDIaiMIeA&t=51s
-> 
-> 文字为个人理解和部分字幕翻译
+*原视频地址：https://www.youtube.com/watch?v=FmpDIaiMIeA&t=51s*
+
+*文字为个人理解和部分字幕翻译*
+
+----------
 
 **目录：**
 
@@ -27,7 +29,6 @@
 神经网络是怎样工作的（3）
 
 7. Others (其他)
-
 
 ----------
 
