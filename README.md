@@ -7,12 +7,17 @@
 
 ## Network Structure
 
-Input layer: input the original training image ----------------------->(28,28,1)
-Conv1: 16 5*5 convolution kernels, the step strides is 1----->(28,28,16)
-Pooling1: The convolution kernel size is 2*2, and the step strides is 2---->(14,14,16)
-Conv2: 32 5*5 convolution kernels, the step strides is 1----->(14,14,32)
-Pooling2: The convolution kernel size is 2*2, and the step strides is 2---->(7,7,32)
-Output layer: The output is a 10-dimensional vector
+**Input layer**: input the original training image ----------------------->(28,28,1)
+
+**Conv1**: 16 5*5 convolution kernels, the step strides is 1----->(28,28,16)
+
+**Pooling1**: The convolution kernel size is 2*2, and the step strides is 2---->(14,14,16)
+
+**Conv2**: 32 5*5 convolution kernels, the step strides is 1----->(14,14,32)
+
+**Pooling2**: The convolution kernel size is 2*2, and the step strides is 2---->(7,7,32)
+
+**Output layer**: The output is a 10-dimensional vector
 
 The network structure derived by `CNN_tb.py` is as follows:
 ![net.png-114.7kB][1]
