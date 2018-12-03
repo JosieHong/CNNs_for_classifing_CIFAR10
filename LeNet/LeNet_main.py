@@ -7,7 +7,7 @@ def main():
 	y_ = tf.placeholder(tf.float32, [None, 10])
 
 	sess = tf.InteractiveSession()
-	lenet_model = LeNet(sess, x, y_)
+	lenet_model = leNet(sess, x, y_)
 
 	mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 	tf.global_variables_initializer().run()
