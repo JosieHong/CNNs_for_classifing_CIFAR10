@@ -1,96 +1,130 @@
-import tensorflow as tf
-import numpy as np
+"""This is a TensorFlow modified implementation of AlexNet by Alex Krizhevsky et all.
+This implementation has been adapted to work
+with the small dimensions of the CIFAR-10 images (32 x 32).
+Code for the original implementaion is also provided but has
+been commented out.
+Paper: ImageNet Classification with Deep Convolutional Neural Networks
+(http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf)
+Explanation on AlexNet can be found in my blog post:
+https://mohitjain.me/2018/06/06/alexnet/
+@author: Mohit Jain (contact: mohitjain1999(at)yahoo.com)
+"""
 
-class alexNet(object):
-    def __init__(self, x, keepPro, classNum, skip, modelPath = "bvlc_alexnet.npy"):
+import tensorflow as tf 
+import numpy as np 
+
+def conv_layer(x, filter_height, filter_width, 
+    num_filters, stride, name, padding = 'SAME', groups = 1):
+    input_channels = int(x.get_shape()[-1])
+    with tf.variable_scope(name) as scope:
+        # Create tf variables for the weights and biases of the conv layer
+        W = tf.get_variable('weights', shape = [filter_height, filter_width, input_channels/groups, num_filters], 
+            initializer = tf.random_normal_initializer(mean = 0, stddev = 0.01))
+        # In the paper the biases of all of the layers have not been initialised the same way
+        # name[4] gives the number of the layer whose weights are being initialised.
+        if (name[4] == '1' or name[4] == '3'):
+            b = tf.get_variable('biases', shape = [num_filters], initializer = tf.constant_initializer(0.0))
+        else:
+            b = tf.get_variable('biases', shape = [num_filters], initializer = tf.constant_initializer(1.0))
+
+    if groups == 1:
+        conv = tf.nn.conv2d(x, W, strides = [1, stride, stride, 1], padding = padding)
+
+    # In the cases of multiple groups, split inputs & weights
+    else:
+        # Split input and weights and convolve them separately
+        input_groups = tf.split(axis = 3, num_or_size_splits = groups, value = x)
+        weight_groups = tf.split(axis = 3, num_or_size_splits = groups, value = W)
+
+        output_groups = [tf.nn.conv2d(i, k, strides = [1, stride, stride, 1], padding = padding)
+                        for i, k in zip(input_groups, weight_groups)]
+        conv = tf.concat(axis = 3, values = output_groups)
+    # Add the biases.
+    z = tf.nn.bias_add(conv, b)
+    # Apply ReLu non linearity.
+    a = tf.nn.relu(z, name = scope.name)
+    return a
+
+def fc_layer(x, input_size, output_size, name, relu = True):
+    """Create a fully connected layer."""
+    with tf.variable_scope(name) as scope:
+        # Create tf variables for the weights and biases.
+        W = tf.get_variable('weights', shape = [input_size, output_size], initializer = tf.random_normal_initializer(mean = 0, stddev = 0.01))
+        b = tf.get_variable('biases', shape = [output_size], initializer = tf.constant_initializer(1.0))
+        # Matrix multiply weights and inputs and add biases.
+        z = tf.nn.bias_add(tf.matmul(x, W), b, name = scope.name)
+    if relu:
+        # Apply ReLu non linearity.
+        a = tf.nn.relu(z)
+        return a
+    else:
+        return z
+
+def max_pool(x, name, filter_height = 3, filter_width = 3, stride = 2, padding = 'SAME'):
+    """Create a max pooling layer."""
+    return tf.nn.max_pool(x, ksize = [1, filter_height, filter_width, 1],
+                        strides = [1, stride, stride, 1], padding = padding,
+                        name = name)
+
+def lrn(x, name, radius = 5, alpha = 1e-04, beta = 0.75, bias = 2.0):
+    """Create a local response normalization layer."""
+    return tf.nn.local_response_normalization(x, depth_radius = radius, alpha = alpha,
+                                                beta = beta, bias = bias, name = name)
+
+def dropout(x, keep_prob):
+    """Create a dropout layer."""
+    return tf.nn.dropout(x, keep_prob = keep_prob)
+
+# Creating the AlexNet Model
+class AlexNet(object):
+    
+    def __init__(self, x, keep_prob, num_classes):
+        """Create the graph of the AlexNet model.
+        Args:
+            x: Placeholder for the input tensor.
+            keep_prob: Dropout probability.
+            num_classes: Number of classes in the dataset.
+        """
+        # Parse input arguments into class variables
         self.X = x
-        self.KEEPPRO = keepPro
-        self.CLASSNUM = classNum
-        self.SKIP = skip
-        self.MODELPATH = modelPath
+        self.NUM_CLASSES = num_classes
+        self.KEEP_PROB = keep_prob
+        # Call the create function to build the computational graph of AlexNet
+        self.create()
 
-        self._build_model()
+    def create(self):
+        """Create the network graph."""
+        # In the original implementation this would be:
+        #conv1 = conv_layer(self.X, 11, 11, 96, 4, padding = 'VALID', name = 'conv1')
+        conv1 = conv_layer(self.X, 11, 11, 96, 2, name = 'conv1')
+        norm1 = lrn(conv1, name = 'norm1')
+        pool1 = max_pool(norm1, padding = 'VALID', name = 'pool1')
 
-    def _build_model(self):
-    	# Layer1
-        self.conv1 = convLayer(self.X, 11, 11, 4, 4, 96, "conv1", "VALID")
-        self.lrn1 = LRN(self.conv1, 2, 2e-05, 0.75, "norm1")
-        self.pool1 = maxPoolLayer(self.lrn1, 3, 3, 2, 2, "pool1", "VALID")
+        conv2 = conv_layer(pool1, 5, 5, 256, 1, groups = 2, name = 'conv2')
+        norm2 = lrn(conv2, name = 'norm2')
+        pool2 = max_pool(norm2, padding = 'VALID', name = 'pool2')
 
-        # Layer2
-        self.conv2 = convLayer(self.pool1, 5, 5, 1, 1, 256, "conv2", groups = 2)
-        self.lrn2 = LRN(self.conv2, 2, 2e-05, 0.75, "lrn2")
-        self.pool2 = maxPoolLayer(self.lrn2, 3, 3, 2, 2, "pool2", "VALID")
+        conv3 = conv_layer(pool2, 3, 3, 384, 1, name = 'conv3')
 
-        # Layer3
-        self.conv3 = convLayer(self.pool2, 3, 3, 1, 1, 384, "conv3")
+        # This conv. layer has been removed in this modified implementation
+        # but is present in the original paper implementaion.
+        #conv4 = conv_layer(conv3, 3, 3, 384, 1, groups = 2, name = 'conv4')
 
-        # Layer4
-        self.conv4 = convLayer(self.conv3, 3, 3, 1, 1, 384, "conv4", groups = 2)
+        conv5 = conv_layer(conv3, 3, 3, 256, 1, groups = 2, name = 'conv5')
+        pool5 = max_pool(conv5, padding = 'VALID', name = 'pool5')
 
-        # Layer5
-        self.conv5 = convLayer(self.conv4, 3, 3, 1, 1, 256, "conv5", groups = 2)
-        self.pool5 = maxPoolLayer(self.conv5, 3, 3, 2, 2, "pool5", "VALID")
+        # In the original paper implementaion this will be:
+        #flattened = tf.reshape(pool5, [-1, 6 * 6 * 256])
+        #fc6 = fc_layer(flattened, 1 * 1 * 256, 4096, name = 'fc6') 
+        flattened = tf.reshape(pool5, [-1, 1 * 1 * 256]) 
+        fc6 = fc_layer(flattened, 1 * 1 * 256, 1024, name = 'fc6')
+        dropout6 = dropout(fc6, self.KEEP_PROB)
 
-        # Layer6
-        self.fcIn = tf.reshape(self.pool5, [-1, 256 * 6 * 6])
-        self.fc1 = fcLayer(self.fcIn, 256 * 6 * 6, 4096, True, "fc6")
-        self.dropout1 = dropout(self.fc1, self.KEEPPRO)
+        # In the original paper implementaion this will be:
+        #fc7 = fc_layer(dropout6, 4096, 4096, name = 'fc7')
+        fc7 = fc_layer(dropout6, 1024, 2048, name = 'fc7')
+        dropout7 = dropout(fc7, self.KEEP_PROB)
 
-        # Layer7
-        self.fc2 = fcLayer(self.dropout1, 4096, 4096, True, "fc7")
-        self.dropout2 = dropout(self.fc2, self.KEEPPRO)
-
-        # Output
-        self.fc3 = fcLayer(self.dropout2, 4096, self.CLASSNUM, True, "fc8")
-
-    def loadModel(self, sess):
-        wDict = np.load(self.MODELPATH, encoding = "bytes").item()
-        for name in wDict:
-            if name not in self.SKIP:
-                with tf.variable_scope(name, reuse = True):
-                    for p in wDict[name]:
-                        if len(p.shape) == 1:
-                            #bias
-                            sess.run(tf.get_variable('b', trainable = False).assign(p))
-                        else:
-                            #weights
-                            sess.run(tf.get_variable('w', trainable = False).assign(p))
-
-	def maxPoolLayer(self, x, kHeight, kWidth, strideX, strideY, name, padding = "SAME"):
-	    return tf.nn.max_pool(x, ksize = [1, kHeight, kWidth, 1],
-	                          strides = [1, strideX, strideY, 1], padding = padding, name = name)
-
-	def dropout(self, x, keepPro, name = None):
-	    return tf.nn.dropout(x, keepPro, name)
-
-	def LRN(self, x, R, alpha, beta, name = None, bias = 1.0):
-	    return tf.nn.local_response_normalization(x, depth_radius = R, alpha = alpha,
-	                                              beta = beta, bias = bias, name = name)	
-
-	def fc(self, x, inputD, outputD, reluFlag, name):
-	    with tf.variable_scope(name) as scope:
-	        w = tf.get_variable("w", shape = [inputD, outputD], dtype = "float")
-	        b = tf.get_variable("b", [outputD], dtype = "float")
-	        out = tf.nn.xw_plus_b(x, w, b, name = scope.name)
-	        if reluFlag:
-	            return tf.nn.relu(out)
-	        else:
-	            return out
-
-	def convLayer(self, x, kHeight, kWidth, strideX, strideY,
-	              featureNum, name, padding = "SAME", groups = 1):
-	    channel = int(x.get_shape()[-1])
-	    conv = lambda a, b: tf.nn.conv2d(a, b, strides = [1, strideY, strideX, 1], padding = padding)
-	    with tf.variable_scope(name) as scope:
-	        w = tf.get_variable("w", shape = [kHeight, kWidth, channel/groups, featureNum])
-	        b = tf.get_variable("b", shape = [featureNum])
-
-	        xNew = tf.split(value = x, num_or_size_splits = groups, axis = 3)
-	        wNew = tf.split(value = w, num_or_size_splits = groups, axis = 3)	
-
-	        featureMap = [conv(t1, t2) for t1, t2 in zip(xNew, wNew)]
-	        mergeFeatureMap = tf.concat(axis = 3, values = featureMap)
-	        out = tf.nn.bias_add(mergeFeatureMap, b)
-
-	        return tf.nn.relu(tf.reshape(out, mergeFeatureMap.get_shape().as_list()), name = scope.name)
+        # In the original paper implementaion this will be:
+        #self.fc8 = fc_layer(dropout7, 4096, self.NUM_CLASSES, relu = False, name = 'fc8')
+        self.fc8 = fc_layer(dropout7, 2048, self.NUM_CLASSES, relu = False, name = 'fc8')
