@@ -1,36 +1,44 @@
+import argparse
 import tensorflow as tf 
 import numpy as np
 import pickle
 from CIFARHelper import CifarHelper
+from LeNet_model import LeNet
 from AlexNet_model import AlexNet
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--model_type", dest='model_type', default='LeNet', help='type of model')
+parser.add_argument('--dataset_dir', dest='dataset_dir', default='cifar-10-batches-py/', help='path of the dataset')
+
+args = parser.parse_args()
 
 def main():
 
-	CIFAR_DIR = '/home/lyc-zc/AlexNet/cifar-10-batches-py/'
+	# Get data.
+	CIFAR_DIR = args.dataset_dir
 	dirs = ['batches.meta','data_batch_1','data_batch_2','data_batch_3','data_batch_4','data_batch_5','test_batch']
 	all_data = [0,1,2,3,4,5,6]
 
 	for i,direc in zip(all_data,dirs):
 		all_data[i] = pickle.load(open(CIFAR_DIR+direc, 'rb'))
 
-	#placeholder for input and dropout rate
 	x = tf.placeholder(tf.float32, shape = [None, 32, 32, 3])
 	y_true = tf.placeholder(tf.float32, shape = [None, 10])
 	keep_prob = tf.placeholder(tf.float32)
 
-	# Create the AlexNet model
-	model = AlexNet(x = x, keep_prob = keep_prob, num_classes = 10)
+	if args.model_type == 'LeNet':
+		model = LeNet(x = x, keep_prob = keep_prob, num_classes = 10)
+		score = model.y_conv
+	elif args.model_type == 'AlexNet':
+		model = AlexNet(x = x, keep_prob = keep_prob, num_classes = 10)
+		score = model.fc8
 
-	#define activation of last layer as score
-	score = model.fc8
 	cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = y_true, logits = score))
 
-	# The optimiser used in this implementation is different
-	# to that used in the paper.
 	optimizer = tf.train.AdamOptimizer(learning_rate = 0.0001)
 	train = optimizer.minimize(cross_entropy)
 
-	# Initialize all global variables
 	init = tf.global_variables_initializer()
 
 	# steps = 10,000 will create 20 epochs.

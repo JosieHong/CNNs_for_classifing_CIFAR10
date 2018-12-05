@@ -1,31 +1,42 @@
 # About_CNN
 
-Here is my implement of some classic convolutional neural networks. 
+Here is my implement of LeNet and AlexNet for classifing on CIFAR10. In order to adapt to the size of CIFAR10, I adjusted some parameters in the network. 
 
 **It is still being updated...**
 
 - LeNet
 - AlexNet
-- VGG
-- GoogLeNet
-- ResNet
+- [Todo]VGG
+- [Todo]GoogLeNet
+- [Todo]ResNet
 
 ## Requirements
 
 - Python 3.6.5
 - Tensorflow 1.2.1
 - numpy
+- CIFAR10
+	CIFAR10 can be download [here][1]. The path to ‘cifar-10-batches-py’ can be specified with the optional parameter ‘--dataset_dir’, which by default is placed in the root directory.
+	
+## Train
+
+```
+# Train by default.
+python main.py
+
+# Train with optional patameters.
+python main.py --model_type \[LeNet/AlexNet] --dataset_dir \[Path to cifar-10-batches-py]
+```
 
 ## LeNet
 
-A implement of LeNet for handwritten digit recognition based on MINIST. 
-
-![image_1ctnk355mrui1ug15sv1p8p14tap.png-342.6kB][1]
+![image_1ctnk355mrui1ug15sv1p8p14tap.png-342.6kB][2]
 
 ## AlenNet
 
-![image_1ctq4gpfk1ieesne1t1m6a0175g1j.png-2047.8kB][2]
+![image_1ctv435tk1u9d1jru1o5gap3m6q9.png-508.9kB][3]
 
-  [1]: http://static.zybuluo.com/JosieException/236ptteo6xg17pn17rrulplx/image_1ctnk355mrui1ug15sv1p8p14tap.png
-  [2]: http://static.zybuluo.com/JosieException/8rtrb61vvwbukmsihmxtovcb/image_1ctq4gpfk1ieesne1t1m6a0175g1j.png
+  [1]: https://www.cs.toronto.edu/~kriz/cifar.html
+  [2]: http://static.zybuluo.com/JosieException/236ptteo6xg17pn17rrulplx/image_1ctnk355mrui1ug15sv1p8p14tap.png
+  [3]: http://static.zybuluo.com/JosieException/lhlds2qb62pihhsn8qw8np6b/image_1ctv435tk1u9d1jru1o5gap3m6q9.png
 

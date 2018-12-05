@@ -1,15 +1,3 @@
-"""This is a TensorFlow modified implementation of AlexNet by Alex Krizhevsky et all.
-This implementation has been adapted to work
-with the small dimensions of the CIFAR-10 images (32 x 32).
-Code for the original implementaion is also provided but has
-been commented out.
-Paper: ImageNet Classification with Deep Convolutional Neural Networks
-(http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf)
-Explanation on AlexNet can be found in my blog post:
-https://mohitjain.me/2018/06/06/alexnet/
-@author: Mohit Jain (contact: mohitjain1999(at)yahoo.com)
-"""
-
 import tensorflow as tf 
 import numpy as np 
 
@@ -17,7 +5,6 @@ def conv_layer(x, filter_height, filter_width,
     num_filters, stride, name, padding = 'SAME', groups = 1):
     input_channels = int(x.get_shape()[-1])
     with tf.variable_scope(name) as scope:
-        # Create tf variables for the weights and biases of the conv layer
         W = tf.get_variable('weights', shape = [filter_height, filter_width, input_channels/groups, num_filters], 
             initializer = tf.random_normal_initializer(mean = 0, stddev = 0.01))
         # In the paper the biases of all of the layers have not been initialised the same way
@@ -29,13 +16,11 @@ def conv_layer(x, filter_height, filter_width,
 
     if groups == 1:
         conv = tf.nn.conv2d(x, W, strides = [1, stride, stride, 1], padding = padding)
-
     # In the cases of multiple groups, split inputs & weights
     else:
         # Split input and weights and convolve them separately
         input_groups = tf.split(axis = 3, num_or_size_splits = groups, value = x)
         weight_groups = tf.split(axis = 3, num_or_size_splits = groups, value = W)
-
         output_groups = [tf.nn.conv2d(i, k, strides = [1, stride, stride, 1], padding = padding)
                         for i, k in zip(input_groups, weight_groups)]
         conv = tf.concat(axis = 3, values = output_groups)
@@ -46,7 +31,6 @@ def conv_layer(x, filter_height, filter_width,
     return a
 
 def fc_layer(x, input_size, output_size, name, relu = True):
-    """Create a fully connected layer."""
     with tf.variable_scope(name) as scope:
         # Create tf variables for the weights and biases.
         W = tf.get_variable('weights', shape = [input_size, output_size], initializer = tf.random_normal_initializer(mean = 0, stddev = 0.01))
@@ -61,23 +45,18 @@ def fc_layer(x, input_size, output_size, name, relu = True):
         return z
 
 def max_pool(x, name, filter_height = 3, filter_width = 3, stride = 2, padding = 'SAME'):
-    """Create a max pooling layer."""
     return tf.nn.max_pool(x, ksize = [1, filter_height, filter_width, 1],
                         strides = [1, stride, stride, 1], padding = padding,
                         name = name)
 
 def lrn(x, name, radius = 5, alpha = 1e-04, beta = 0.75, bias = 2.0):
-    """Create a local response normalization layer."""
     return tf.nn.local_response_normalization(x, depth_radius = radius, alpha = alpha,
                                                 beta = beta, bias = bias, name = name)
 
 def dropout(x, keep_prob):
-    """Create a dropout layer."""
     return tf.nn.dropout(x, keep_prob = keep_prob)
 
-# Creating the AlexNet Model
 class AlexNet(object):
-    
     def __init__(self, x, keep_prob, num_classes):
         """Create the graph of the AlexNet model.
         Args:

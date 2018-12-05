@@ -1,5 +1,11 @@
 import numpy as np 
 
+def one_hot_encode(vec, vals=10):
+    n = len(vec)
+    out = np.zeros((n, vals))
+    out[range(n), vec] = 1
+    return out
+
 class CifarHelper(object):
 	
     def __init__(self, all_data):
@@ -13,7 +19,6 @@ class CifarHelper(object):
         data_batch5 = all_data[5]
         test_batch = all_data[6]
 
-
         # Grabs a list of all the data batches for training
         self.all_train_batches = [data_batch1,data_batch2,data_batch3,data_batch4,data_batch5]
         # Grabs a list of all the test batches (really just one batch)
@@ -26,12 +31,6 @@ class CifarHelper(object):
         self.test_images = None
         self.test_labels = None
 
-    def one_hot_encode(self, vec, vals=10):
-        n = len(vec)
-        out = np.zeros((n, vals))
-        out[range(n), vec] = 1
-        return out
-    
     def set_up_images(self):
         
         print("Setting Up Training Images and Labels")
@@ -43,7 +42,7 @@ class CifarHelper(object):
         # Reshapes and normalizes training images
         self.training_images = self.training_images.reshape(train_len,3,32,32).transpose(0,2,3,1)/255
         # One hot Encodes the training labels (e.g. [0,0,0,1,0,0,0,0,0,0])
-        self.training_labels = self.one_hot_encode(np.hstack([d[b"labels"] for d in self.all_train_batches]), 10)
+        self.training_labels = one_hot_encode(np.hstack([d[b"labels"] for d in self.all_train_batches]), 10)
         
         print("Setting Up Test Images and Labels")
         
@@ -54,7 +53,7 @@ class CifarHelper(object):
         # Reshapes and normalizes test images
         self.test_images = self.test_images.reshape(test_len,3,32,32).transpose(0,2,3,1)/255
         # One hot Encodes the test labels (e.g. [0,0,0,1,0,0,0,0,0,0])
-        self.test_labels = self.one_hot_encode(np.hstack([d[b"labels"] for d in self.test_batch]), 10)
+        self.test_labels = one_hot_encode(np.hstack([d[b"labels"] for d in self.test_batch]), 10)
 
     def next_batch(self, batch_size):
         # Note that the 100 dimension in the reshape call is set by an assumed batch size of 100
