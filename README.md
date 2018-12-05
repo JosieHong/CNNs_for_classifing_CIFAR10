@@ -24,7 +24,7 @@
 python main.py
 
 # Train with optional patameters.
-python main.py --model_type \[LeNet/AlexNet] --dataset_dir \[Path to cifar-10-batches-py]
+python main.py --model_type [LeNet/AlexNet] --dataset_dir [Path to cifar-10-batches-py]
 ```
 
   [1]: https://www.cs.toronto.edu/~kriz/cifar.html
