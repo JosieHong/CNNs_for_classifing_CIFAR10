@@ -1,5 +1,13 @@
-# My configurations
+# Dataset
 cifar-10-batches-py
 cifar-10-python.tar.gz
+
+# Pretraining model
 bvlc_alexnet.npy
+
+# Other main
+LeNet_main.py
+AlexNet_main.py
+
+# Error record
 Error.py
