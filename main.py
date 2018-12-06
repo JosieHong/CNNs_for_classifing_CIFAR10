@@ -5,6 +5,7 @@ import pickle
 from CIFARHelper import CifarHelper
 from LeNet_model import LeNet
 from AlexNet_model import AlexNet
+from VGG16_model import VGG16
 
 parser = argparse.ArgumentParser()
 
@@ -33,6 +34,9 @@ def main():
 	elif args.model_type == 'AlexNet':
 		model = AlexNet(x = x, keep_prob = keep_prob, num_classes = 10)
 		score = model.fc8
+	elif args.model_type == 'VGG16':
+		model = VGG16(x = x, keep_prob = keep_prob, num_classes = 10)
+		score = model.fc3
 
 	cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = y_true, logits = score))
 

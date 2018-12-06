@@ -58,21 +58,14 @@ def dropout(x, keep_prob):
 
 class AlexNet(object):
     def __init__(self, x, keep_prob, num_classes):
-        """Create the graph of the AlexNet model.
-        Args:
-            x: Placeholder for the input tensor.
-            keep_prob: Dropout probability.
-            num_classes: Number of classes in the dataset.
-        """
-        # Parse input arguments into class variables
+
         self.X = x
         self.NUM_CLASSES = num_classes
         self.KEEP_PROB = keep_prob
-        # Call the create function to build the computational graph of AlexNet
-        self.create()
+        self._build_model()
 
-    def create(self):
-        """Create the network graph."""
+    def _build_model(self):
+        
         # In the original implementation this would be:
         #conv1 = conv_layer(self.X, 11, 11, 96, 4, padding = 'VALID', name = 'conv1')
         conv1 = conv_layer(self.X, 11, 11, 96, 2, name = 'conv1')
