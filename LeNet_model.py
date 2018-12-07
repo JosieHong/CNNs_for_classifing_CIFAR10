@@ -48,5 +48,6 @@ class LeNet(object):
 		# Output layer
 		W_fc2 = weight_variable([120, self.num_classes])
 		b_fc2 = bias_variable([self.num_classes])
-		self.y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+		y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+		self.output = y_conv
 

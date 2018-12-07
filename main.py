@@ -30,13 +30,12 @@ def main():
 
 	if args.model_type == 'LeNet':
 		model = LeNet(x = x, keep_prob = keep_prob, num_classes = 10)
-		score = model.y_conv
 	elif args.model_type == 'AlexNet':
 		model = AlexNet(x = x, keep_prob = keep_prob, num_classes = 10)
-		score = model.fc8
 	elif args.model_type == 'VGG16':
 		model = VGG16(x = x, keep_prob = keep_prob, num_classes = 10)
-		score = model.fc3
+
+	score = model.output
 
 	cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = y_true, logits = score))
 

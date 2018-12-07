@@ -16,7 +16,7 @@ def conv_layer(x, num_filters, name, filter_height = 3, filter_width = 3, stride
 
 	return tf.nn.relu(z, name = scope.name)
 
-def fc_layer(x, input_size, output_size, name, relu = True):
+def fc_layer(x, input_size, output_size, name, activation = 'relu'):
 
 	with tf.variable_scope(name) as scope:
 		W = tf.get_variable('weights', shape = [input_size, output_size], 
@@ -26,9 +26,11 @@ def fc_layer(x, input_size, output_size, name, relu = True):
 
 	z = tf.nn.bias_add(tf.matmul(x, W), b, name = scope.name)
 	
-	if relu:
+	if activation == 'relu':
 		# Apply ReLu non linearity.
 		return tf.nn.relu(z, name = scope.name)
+	elif activation == 'softmax':
+		return tf.nn.softmax(z, name = scope.name)
 	else:
 		return z
 
@@ -84,15 +86,16 @@ class VGG16(object):
 		# In the original paper implementaion this will be:
 		#flattened = tf.reshape(block5_pool, [-1, 7*7*512]) 
 		#fc1 = fc_layer(flattened, 7*7*512, 7*7*512, name = 'fc1')
-		flattened = tf.reshape(block5_pool, [-1, 10*10*512]) 
-		fc1 = fc_layer(flattened, 10*10*512, 10*10*512, name = 'fc1')
+		flattened = tf.reshape(block5_pool, [-1, 1*1*512]) 
+		fc1 = fc_layer(flattened, 1*1*512, 1*1*512, name = 'fc1', activation = 'relu')
 		dropout1 = dropout(fc1, self.KEEP_PROB)
 
 		# In the original paper implementaion this will be:
 		#fc2 = fc_layer(dropout1, 7*7*512, 7*7*512, name = 'fc1')
-		fc2 = fc_layer(dropout1, 10*10*512, 10*10*512, name = 'fc2')
+		fc2 = fc_layer(dropout1, 1*1*512, 1*1*512, name = 'fc2', activation = 'relu')
 		dropout2 = dropout(fc2, self.KEEP_PROB)
 
 		# In the original paper implementaion this will be:
 		#self.fc3 = fc_layer(dropout2, 7*7*512, self.NUM_CLASSES, name = 'fc3', relu = False)
-		self.fc3 = fc_layer(dropout2, 10*10*512, self.NUM_CLASSES, name = 'fc3', relu = False)
+		fc3 = fc_layer(dropout2, 1*1*512, self.NUM_CLASSES, name = 'fc3', activation = 'softmax')
+		self.output = fc3

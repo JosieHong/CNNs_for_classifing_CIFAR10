@@ -10,9 +10,11 @@ def conv_layer(x, filter_height, filter_width,
         # In the paper the biases of all of the layers have not been initialised the same way
         # name[4] gives the number of the layer whose weights are being initialised.
         if (name[4] == '1' or name[4] == '3'):
-            b = tf.get_variable('biases', shape = [num_filters], initializer = tf.constant_initializer(0.0))
+            b = tf.get_variable('biases', shape = [num_filters], 
+                initializer = tf.constant_initializer(0.0))
         else:
-            b = tf.get_variable('biases', shape = [num_filters], initializer = tf.constant_initializer(1.0))
+            b = tf.get_variable('biases', shape = [num_filters], 
+                initializer = tf.constant_initializer(1.0))
 
     if groups == 1:
         conv = tf.nn.conv2d(x, W, strides = [1, stride, stride, 1], padding = padding)
@@ -33,8 +35,10 @@ def conv_layer(x, filter_height, filter_width,
 def fc_layer(x, input_size, output_size, name, relu = True):
     with tf.variable_scope(name) as scope:
         # Create tf variables for the weights and biases.
-        W = tf.get_variable('weights', shape = [input_size, output_size], initializer = tf.random_normal_initializer(mean = 0, stddev = 0.01))
-        b = tf.get_variable('biases', shape = [output_size], initializer = tf.constant_initializer(1.0))
+        W = tf.get_variable('weights', shape = [input_size, output_size], 
+            initializer = tf.random_normal_initializer(mean = 0, stddev = 0.01))
+        b = tf.get_variable('biases', shape = [output_size], 
+            initializer = tf.constant_initializer(1.0))
         # Matrix multiply weights and inputs and add biases.
         z = tf.nn.bias_add(tf.matmul(x, W), b, name = scope.name)
     if relu:
@@ -99,4 +103,5 @@ class AlexNet(object):
 
         # In the original paper implementaion this will be:
         #self.fc8 = fc_layer(dropout7, 4096, self.NUM_CLASSES, relu = False, name = 'fc8')
-        self.fc8 = fc_layer(dropout7, 2048, self.NUM_CLASSES, relu = False, name = 'fc8')
+        fc8 = fc_layer(dropout7, 2048, self.NUM_CLASSES, relu = False, name = 'fc8')
+        self.output = fc8
