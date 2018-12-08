@@ -7,6 +7,7 @@ from LeNet_model import LeNet
 from AlexNet_model import AlexNet
 from VGG16_model import VGG16
 from GoogLeNet_model import GoogLeNet
+from ResNet_model import ResNet50
 
 parser = argparse.ArgumentParser()
 
@@ -37,6 +38,10 @@ def main():
 		model = VGG16(x = x, keep_prob = keep_prob, num_classes = 10)
 	elif args.model_type == 'GoogLeNet':
 		model = GoogLeNet(x = x, keep_prob = keep_prob, num_classes = 10)
+	elif args.model_type == 'ResNet50':
+		model = ResNet50(x = x, keep_prob = keep_prob, num_classes = 10)
+	else:
+		print('Please check the model_type!')
 
 	score = model.output
 
