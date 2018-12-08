@@ -5,8 +5,5 @@ Notes_of_CNNs
 cifar-10-batches-py
 cifar-10-python.tar.gz
 
-# Pretraining model
-bvlc_alexnet.npy
-
 # Errors record
 Error.py

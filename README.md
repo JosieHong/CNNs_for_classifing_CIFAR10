@@ -1,12 +1,10 @@
-# CNNs_for_classifing_on_CIFAR10
+# CNNs_for_classifing_CIFAR10
 
  Implement of LeNet, AlexNet, VGG16, GoogLeNet, ResNet50 for classifing on CIFAR10 with tensorflow. In order to adapt to the size of CIFAR10, I adjusted some parameters in the network. 
 
-**It is still being updated...**
-
 - LeNet
 - AlexNet
-- VGG
+- VGG16
 - GoogLeNet
 - ResNet50
 
