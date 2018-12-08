@@ -35,7 +35,7 @@ def fc_layer(x, input_size, output_size, name, activation = 'relu'):
 		return z
 
 def max_pool(x, name, filter_height = 2, filter_width = 2, stride = 2, padding = 'SAME'):
-		return tf.nn.max_pool(x, ksize = [1, filter_height, filter_width, 1],
+	return tf.nn.max_pool(x, ksize = [1, filter_height, filter_width, 1],
 						strides = [1, stride, stride, 1], padding = padding,
 						name = name)
 

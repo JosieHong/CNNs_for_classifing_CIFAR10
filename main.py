@@ -6,6 +6,7 @@ from CIFARHelper import CifarHelper
 from LeNet_model import LeNet
 from AlexNet_model import AlexNet
 from VGG16_model import VGG16
+from GoogLeNet_model import GoogLeNet
 
 parser = argparse.ArgumentParser()
 
@@ -34,6 +35,8 @@ def main():
 		model = AlexNet(x = x, keep_prob = keep_prob, num_classes = 10)
 	elif args.model_type == 'VGG16':
 		model = VGG16(x = x, keep_prob = keep_prob, num_classes = 10)
+	elif args.model_type == 'GoogLeNet':
+		model = GoogLeNet(x = x, keep_prob = keep_prob, num_classes = 10)
 
 	score = model.output
 
@@ -62,7 +65,7 @@ def main():
 			sess.run(train, feed_dict = {x : batch[0], y_true : batch[1], keep_prob : 0.5})
 			# Print accuracy after every epoch.
 			# 500 * 100 = 50,000 which is one complete batch of data.
-			if i%500 == 0:
+			if i % 500 == 0:
 				
 				print("EPOCH: {}".format(i / 500))
 				print("ACCURACY ")

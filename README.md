@@ -1,13 +1,13 @@
 # CNNs_for_classifing_on_CIFAR10
 
- Implement of LeNet and AlexNet for classifing on CIFAR10 with tensorflow. In order to adapt to the size of CIFAR10, I adjusted some parameters in the network. 
+ Implement of LeNet, AlexNet, VGG16, GoogLeNet for classifing on CIFAR10 with tensorflow. In order to adapt to the size of CIFAR10, I adjusted some parameters in the network. 
 
 **It is still being updated...**
 
 - LeNet
 - AlexNet
 - VGG
-- [Todo]GoogLeNet
+- GoogLeNet
 - [Todo]ResNet
 
 ## Requirements
@@ -24,7 +24,7 @@
 $ python main.py
 
 # Train with optional patameters.
-$ python main.py --model_type [LeNet/AlexNet/VGG16] --dataset_dir [Path to cifar-10-batches-py]
+$ python main.py --model_type [LeNet/AlexNet/VGG16/GoogLeNet] --dataset_dir [Path to cifar-10-batches-py]
 ```
 
   [1]: https://www.cs.toronto.edu/~kriz/cifar.html
