@@ -45,10 +45,18 @@ def main():
 
 	score = model.output
 
-	cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = y_true, logits = score))
+	with tf.name_scope('cross_entropy'): 
+		cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = y_true, logits = score))
+	tf.summary.scalar('cross_entropy', cross_entropy)
 
-	optimizer = tf.train.AdamOptimizer(learning_rate = 0.0001)
-	train = optimizer.minimize(cross_entropy)
+	with tf.name_scope('train'):
+		optimizer = tf.train.AdamOptimizer(learning_rate = 0.0001)
+		train = optimizer.minimize(cross_entropy)
+
+	with tf.name_scope('accuracy'):
+		matches = tf.equal(tf.argmax(score, 1), tf.argmax(y_true, 1))
+		acc = tf.reduce_mean(tf.cast(matches, tf.float32))
+	tf.summary.scalar('accuracy', acc)
 
 	init = tf.global_variables_initializer()
 
@@ -62,7 +70,10 @@ def main():
 	ch.set_up_images()
 
 	with tf.Session() as sess:
+		# Write Logs
 		sess.run(init)
+		merged_summary_op = tf.contrib.deprecated.merge_all_summaries()
+		summary_writer = tf.summary.FileWriter('logs/', sess.graph)
 		for i in range(steps):
 			# get next batch of data.
 			batch = ch.next_batch(100)
@@ -71,16 +82,13 @@ def main():
 			# Print accuracy after every epoch.
 			# 500 * 100 = 50,000 which is one complete batch of data.
 			if i % 500 == 0:
-				
 				print("EPOCH: {}".format(i / 500))
 				print("ACCURACY ")
-				
-				matches = tf.equal(tf.argmax(score, 1), tf.argmax(y_true, 1))
-				acc = tf.reduce_mean(tf.cast(matches, tf.float32))
-				
 				# On valid/test set.
 				print(sess.run(acc, feed_dict = {x : ch.test_images, y_true : ch.test_labels, keep_prob : 1.0}))
-				print('\n')
+				summary_writer.add_summary(sess.run(merged_summary_op, feed_dict = {x : ch.test_images, y_true : ch.test_labels, keep_prob : 1.0}), i)
+
+		summary_writer.close()
 
 if __name__ == '__main__':
 

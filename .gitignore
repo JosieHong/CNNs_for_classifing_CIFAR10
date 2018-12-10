@@ -7,3 +7,9 @@ cifar-10-python.tar.gz
 
 # Errors record
 Error.py
+
+# Logs record
+logs
+
+# Net structure img
+img
