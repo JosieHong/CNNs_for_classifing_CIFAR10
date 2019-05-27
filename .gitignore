@@ -13,3 +13,9 @@ logs
 
 # Net structure img
 img
+
+# Results
+RESULTS.md
+
+# python
+__pycache__
