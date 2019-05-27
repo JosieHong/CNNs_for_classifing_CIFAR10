@@ -25,8 +25,8 @@ $ python main.py
 
 # Train with optional patameters and test.
 $ python main.py	--model_type	[LeNet/AlexNet/VGG16/GoogLeNet/ResNet50] 
-					--dataset_dir	[Path to cifar-10-batches-py] 
-					--model_dir		[A .ckpt file of pretrained model or A folder for saving model] 
+			--dataset_dir	[Path to cifar-10-batches-py] 
+			--model_dir	[A .ckpt file of pretrained model or A folder for saving model] 
 ```
 
 ## Use GPU
