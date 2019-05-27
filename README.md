@@ -17,7 +17,7 @@ Implement of CNNs for classifing on CIFAR10 with tensorflow(CPU). In order to ad
 
 ## Train and Test
 
-Here I only iterate 20 epoches (10000 steps), you can increase the number of iterations by using the last trained model to achieve higher accuracy. Besides, you can also change `learning rate` and `steps` in `main.py`.
+Here I only iterate 20 epoches (10000 steps), you can increase the number of iterations by using the last trained model to achieve higher accuracy. Besides, you can also change `learning rate` and `steps` in ‘main.py’.
 
 ```
 # Train and test by default.
